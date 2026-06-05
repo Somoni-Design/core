@@ -49,19 +49,25 @@ export class AuthService {
 		})
 
 		if (!user) {
-			await this.prisma.user.create({
+			const createdUser = await this.prisma.user.create({
 				data: {
 					phone,
 					isPhoneVerified: true,
 					status: UserStatus.PENDING
+				},
+				select: {
+					id: true,
+					phone: true,
+					status: true
 				}
 			})
 
 			return {
-				action: AUTH_ACTIONS.WAIT_APPROVAL
+				action: AUTH_ACTIONS.WAIT_APPROVAL,
+				user: createdUser
 			}
 		}
-
+		
 		if (user.status === UserStatus.PENDING) {
 			return {
 				action: AUTH_ACTIONS.WAIT_APPROVAL

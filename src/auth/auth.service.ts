@@ -67,7 +67,7 @@ export class AuthService {
 				user: createdUser
 			}
 		}
-		
+
 		if (user.status === UserStatus.PENDING) {
 			return {
 				action: AUTH_ACTIONS.WAIT_APPROVAL
@@ -196,6 +196,7 @@ export class AuthService {
 			user: {
 				id: user.id,
 				phone: user.phone,
+				fullName: user.fullName,
 				role: user.role,
 				status: user.status
 			}

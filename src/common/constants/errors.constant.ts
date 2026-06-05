@@ -1,0 +1,50 @@
+export const ERROR_CODES = {
+  USER_NOT_FOUND: 'USER_NOT_FOUND',
+  USER_BLOCKED: 'USER_BLOCKED',
+  USER_ROLE_CHANGE_DENIED: 'USER_ROLE_CHANGE_DENIED',
+  USER_PHONE_CHANGE_DENIED: 'USER_PHONE_CHANGE_DENIED',
+  USER_DELETE_SELF_DENIED: 'USER_DELETE_SELF_DENIED',
+
+  PHONE_EXISTS: 'PHONE_EXISTS',
+  SAME_PHONE: 'SAME_PHONE',
+
+  INVALID_CODE: 'INVALID_CODE',
+  CODE_EXPIRED: 'CODE_EXPIRED',
+  TOO_MANY_ATTEMPTS: 'TOO_MANY_ATTEMPTS',
+
+  ACCESS_NOT_GRANTED: 'ACCESS_NOT_GRANTED',
+  PASSWORD_ALREADY_SET: 'PASSWORD_ALREADY_SET',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+
+  FORBIDDEN: 'FORBIDDEN',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+} as const
+
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES]
+
+export const ERRORS: Record<ErrorCode, string> = {
+	[ERROR_CODES.USER_NOT_FOUND]: 'User not found',
+	[ERROR_CODES.USER_BLOCKED]: 'User is blocked',
+	[ERROR_CODES.USER_ROLE_CHANGE_DENIED]: 'You cannot change your role',
+	[ERROR_CODES.USER_PHONE_CHANGE_DENIED]: 'You cannot change your phone number',
+	[ERROR_CODES.USER_DELETE_SELF_DENIED]: 'You cannot delete yourself',
+
+	[ERROR_CODES.PHONE_EXISTS]: 'Phone already exists',
+	[ERROR_CODES.SAME_PHONE]: 'New phone is the same as current phone',
+
+	[ERROR_CODES.INVALID_CODE]: 'Invalid code',
+	[ERROR_CODES.CODE_EXPIRED]: 'Code expired or not found',
+	[ERROR_CODES.TOO_MANY_ATTEMPTS]: 'Too many attempts',
+	[ERROR_CODES.ACCESS_NOT_GRANTED]: 'Access not granted',
+	[ERROR_CODES.PASSWORD_ALREADY_SET]: 'Password is already set',
+	[ERROR_CODES.INVALID_CREDENTIALS]: 'Invalid credentials',
+	[ERROR_CODES.FORBIDDEN]: 'Forbidden',
+	[ERROR_CODES.UNAUTHORIZED]: 'Unauthorized'
+}
+
+export function errorResponse(code: ErrorCode) {
+	return {
+		code,
+		message: ERRORS[code]
+	}
+}

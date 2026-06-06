@@ -1,0 +1,73 @@
+import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+	ERROR_CODES,
+	errorResponse
+} from 'src/common/constants/errors.constant'
+import { PrismaService } from 'src/prisma.service'
+import { CreateApartmentDto } from './dto/create-apartment.dto'
+import { UpdateApartmentDto } from './dto/update-apartment.dto'
+import { listResponse } from 'src/common/helpers/list-response.helper'
+
+@Injectable()
+export class ApartmentService {
+	constructor(private readonly prisma: PrismaService) {}
+
+	async create(dto: CreateApartmentDto) {
+		return this.prisma.apartment.create({
+			data: {
+				name: dto.name
+			}
+		})
+	}
+
+	async findAll() {
+		const [list, count] = await this.prisma.$transaction([
+			this.prisma.apartment.findMany({
+				orderBy: {
+					createdAt: 'desc'
+				}
+			}),
+			this.prisma.apartment.count()
+		])
+		return listResponse(list, count)
+	}
+
+	async findOne(id: string) {
+		const apartment = await this.prisma.apartment.findUnique({
+			where: { id },
+			include: {
+				expenses: {
+					orderBy: {
+						spentAt: 'desc'
+					}
+				}
+			}
+		})
+
+		if (!apartment) {
+			throw new BadRequestException(
+				errorResponse(ERROR_CODES.APARTMENT_NOT_FOUND)
+			)
+		}
+
+		return apartment
+	}
+
+	async update(id: string, dto: UpdateApartmentDto) {
+		await this.findOne(id)
+
+		return this.prisma.apartment.update({
+			where: { id },
+			data: {
+				name: dto.name
+			}
+		})
+	}
+
+	async remove(id: string) {
+		await this.findOne(id)
+		return this.prisma.apartment.delete({
+			where: { id }
+		})
+	}
+}

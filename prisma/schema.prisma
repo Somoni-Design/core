@@ -29,6 +29,7 @@ model User {
   role            UserRole?
   status          UserStatus @default(PENDING)
   isPhoneVerified Boolean    @default(false)
+  expenses        Expense[]
 
   @@map("users")
 }
@@ -44,4 +45,34 @@ model AuthCode {
 
   @@index([phone])
   @@map("auth_codes")
+}
+
+model Expense {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  amount    Decimal  @db.Decimal(12, 2)
+  spentAt   DateTime
+
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+
+  supplierId String
+  supplier   User   @relation(fields: [supplierId], references: [id])
+
+  @@index([apartmentId])
+  @@index([supplierId])
+  @@index([spentAt])
+  @@map("expenses")
+}
+
+model Apartment {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  expenses  Expense[]
+
+  @@map("apartments")
 }

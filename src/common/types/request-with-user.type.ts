@@ -1,12 +1,8 @@
-import {UserRole} from '@prisma/client'
-import type { Request } from 'express'
+import { UserRole } from '@prisma/client'
 
-export type JwtUser = {
-	id: string
-	phone: string
-	role: UserRole
-}
-
-export type RequestWithUser = Request & {
-	user: JwtUser
+export type RequestWithUser = {
+	user: {
+		id: string
+		role: UserRole
+	}
 }

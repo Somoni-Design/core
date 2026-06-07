@@ -1,21 +1,33 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PassportStrategy } from '@nestjs/passport'
+import { Request } from 'express'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { UserRole } from '@prisma/client'
+
+type JwtPayload = {
+	sub: string
+	phone: string
+	role?: string
+}
+
+const cookieExtractor = (req: Request): string | null => {
+	return req?.cookies?.accessToken || null
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-	constructor(private readonly configService: ConfigService) {
+	constructor(configService: ConfigService) {
 		super({
-			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-			ignoreExpiration: false,
+			jwtFromRequest: ExtractJwt.fromExtractors([
+				cookieExtractor,
+				ExtractJwt.fromAuthHeaderAsBearerToken()
+			]),
 			secretOrKey:
-				configService.get<string>('JWT_ACCESS_SECRET') || 'access_secret'
+				configService.get<string>('JWT_ACCESS_SECRET') || 'access_secret_key'
 		})
 	}
 
-	async validate(payload: { sub: number; phone: string; role: UserRole }) {
+	async validate(payload: JwtPayload) {
 		return {
 			id: payload.sub,
 			phone: payload.phone,

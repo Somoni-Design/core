@@ -1,5 +1,7 @@
+import { ExpenseType } from '@prisma/client'
 import {
 	IsDateString,
+	IsEnum,
 	IsNotEmpty,
 	IsNumber,
 	IsString,
@@ -21,4 +23,7 @@ export class CreateExpenseDto {
 
 	@IsDateString()
 	spentAt!: string
+
+	@IsEnum(ExpenseType)
+	type!: ExpenseType
 }

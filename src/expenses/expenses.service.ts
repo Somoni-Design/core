@@ -20,6 +20,7 @@ export class ExpensesService {
 				amount: dto.amount,
 				spentAt: new Date(dto.spentAt),
 				apartmentId: dto.apartmentId,
+				type: dto.type,
 				supplierId
 			},
 			include: {
@@ -109,6 +110,7 @@ export class ExpensesService {
 				title: dto.title,
 				amount: dto.amount,
 				spentAt: dto.spentAt ? new Date(dto.spentAt) : undefined,
+				type: dto.type,
 				apartmentId: dto.apartmentId
 			},
 			include: {

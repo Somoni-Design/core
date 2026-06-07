@@ -12,10 +12,11 @@ import { UpdateApartmentDto } from './dto/update-apartment.dto'
 export class ApartmentService {
 	constructor(private readonly prisma: PrismaService) {}
 
-	async create(dto: CreateApartmentDto) {
+	async create(userId: string, dto: CreateApartmentDto) {
 		return this.prisma.apartment.create({
 			data: {
-				name: dto.name
+				name: dto.name,
+				supplierId: userId
 			}
 		})
 	}
@@ -29,6 +30,26 @@ export class ApartmentService {
 			}),
 			this.prisma.apartment.count()
 		])
+		return listResponse(list, count)
+	}
+
+	async findBySupplierId(userId: string) {
+		const [list, count] = await this.prisma.$transaction([
+			this.prisma.apartment.findMany({
+				where: {
+					supplierId: userId
+				},
+				orderBy: {
+					createdAt: 'desc'
+				}
+			}),
+			this.prisma.apartment.count({
+				where: {
+					supplierId: userId
+				}
+			})
+		])
+
 		return listResponse(list, count)
 	}
 

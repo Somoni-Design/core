@@ -34,7 +34,9 @@ model User {
   role            UserRole?
   status          UserStatus @default(PENDING)
   isPhoneVerified Boolean    @default(false)
-  expenses        Expense[]
+
+  expenses   Expense[]
+  apartments Apartment[]
 
   @@map("users")
 }
@@ -75,11 +77,16 @@ model Expense {
 }
 
 model Apartment {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   name      String
-  expenses  Expense[]
 
+  supplierId String
+  supplier   User   @relation(fields: [supplierId], references: [id])
+
+  expenses Expense[]
+
+  @@index([supplierId])
   @@map("apartments")
 }

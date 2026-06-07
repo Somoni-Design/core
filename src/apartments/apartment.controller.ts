@@ -11,32 +11,42 @@ import {
 	Post,
 	Req
 } from '@nestjs/common'
-
 import { Auth } from 'src/auth/decorators/auth.decorator'
 import {
 	ERROR_CODES,
 	errorResponse
 } from 'src/common/constants/errors.constant'
+import { CurrentUser } from 'src/common/decorators/current-user.decorator'
 import { RequestWithUser } from 'src/common/types/request-with-user.type'
 
 import { ApartmentService } from './apartment.service'
 import { CreateApartmentDto } from './dto/create-apartment.dto'
 import { UpdateApartmentDto } from './dto/update-apartment.dto'
 
+@Auth()
 @Controller('apartments')
 export class ApartmentController {
 	constructor(private readonly apartmentsService: ApartmentService) {}
 
 	@Post()
 	@HttpCode(HttpStatus.CREATED)
-	create(@Body() dto: CreateApartmentDto) {
-		return this.apartmentsService.create(dto)
+	create(
+		@CurrentUser() user: RequestWithUser['user'],
+		@Body() dto: CreateApartmentDto
+	) {
+		return this.apartmentsService.create(user.id, dto)
 	}
 
 	@Get()
 	@HttpCode(HttpStatus.OK)
 	findAll() {
 		return this.apartmentsService.findAll()
+	}
+
+	@Get('my')
+	@HttpCode(HttpStatus.OK)
+	findBySupplierId(@CurrentUser() user: RequestWithUser['user']) {
+		return this.apartmentsService.findBySupplierId(user.id)
 	}
 
 	@Get(':id')

@@ -7,6 +7,7 @@ export const ERROR_CODES = {
 
 	APARTMENT_NOT_FOUND: 'APARTMENT_NOT_FOUND',
 	EXPENSE_NOT_FOUND: 'EXPENSE_NOT_FOUND',
+	APARTMENT_DELETE_DENIED: 'APARTMENT_DELETE_DENIED',
 
 	PHONE_EXISTS: 'PHONE_EXISTS',
 	SAME_PHONE: 'SAME_PHONE',
@@ -34,6 +35,8 @@ export const ERRORS: Record<ErrorCode, string> = {
 
 	[ERROR_CODES.APARTMENT_NOT_FOUND]: 'Apartment not found',
 	[ERROR_CODES.EXPENSE_NOT_FOUND]: 'Expense not found',
+	[ERROR_CODES.APARTMENT_DELETE_DENIED]:
+		'Only administrator can delete apartment',
 
 	[ERROR_CODES.PHONE_EXISTS]: 'Phone already exists',
 	[ERROR_CODES.SAME_PHONE]: 'New phone is the same as current phone',

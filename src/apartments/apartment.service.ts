@@ -3,10 +3,10 @@ import {
 	ERROR_CODES,
 	errorResponse
 } from 'src/common/constants/errors.constant'
+import { listResponse } from 'src/common/helpers/list-response.helper'
 import { PrismaService } from 'src/prisma.service'
 import { CreateApartmentDto } from './dto/create-apartment.dto'
 import { UpdateApartmentDto } from './dto/update-apartment.dto'
-import { listResponse } from 'src/common/helpers/list-response.helper'
 
 @Injectable()
 export class ApartmentService {
@@ -66,8 +66,18 @@ export class ApartmentService {
 
 	async remove(id: string) {
 		await this.findOne(id)
-		return this.prisma.apartment.delete({
-			where: { id }
-		})
+
+		await this.prisma.$transaction([
+			this.prisma.expense.deleteMany({
+				where: {
+					apartmentId: id
+				}
+			}),
+			this.prisma.apartment.delete({
+				where: {
+					id
+				}
+			})
+		])
 	}
 }

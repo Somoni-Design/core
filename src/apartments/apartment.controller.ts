@@ -2,13 +2,22 @@ import {
 	Body,
 	Controller,
 	Delete,
+	ForbiddenException,
 	Get,
 	HttpCode,
 	HttpStatus,
 	Param,
 	Patch,
-	Post
+	Post,
+	Req
 } from '@nestjs/common'
+
+import { Auth } from 'src/auth/decorators/auth.decorator'
+import {
+	ERROR_CODES,
+	errorResponse
+} from 'src/common/constants/errors.constant'
+import { RequestWithUser } from 'src/common/types/request-with-user.type'
 
 import { ApartmentService } from './apartment.service'
 import { CreateApartmentDto } from './dto/create-apartment.dto'
@@ -42,9 +51,16 @@ export class ApartmentController {
 		return this.apartmentsService.update(id, dto)
 	}
 
+	@Auth()
 	@Delete(':id')
 	@HttpCode(HttpStatus.NO_CONTENT)
-	remove(@Param('id') id: string) {
+	remove(@Param('id') id: string, @Req() req: RequestWithUser) {
+		if (req.user.role !== 'ADMIN') {
+			throw new ForbiddenException(
+				errorResponse(ERROR_CODES.APARTMENT_DELETE_DENIED)
+			)
+		}
+
 		return this.apartmentsService.remove(id)
 	}
 }

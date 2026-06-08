@@ -70,7 +70,12 @@ export class AuthService {
 
 		if (user.status === UserStatus.PENDING) {
 			return {
-				action: AUTH_ACTIONS.WAIT_APPROVAL
+				action: AUTH_ACTIONS.WAIT_APPROVAL,
+				user: {
+					id: user.id,
+					phone: user.phone,
+					status: user.status
+				}
 			}
 		}
 
@@ -99,7 +104,7 @@ export class AuthService {
 			action: AUTH_ACTIONS.LOGIN_WITH_PASSWORD
 		}
 	}
-
+	
 	async setPassword(dto: SetPasswordDto) {
 		let payload: SetPasswordPayload
 

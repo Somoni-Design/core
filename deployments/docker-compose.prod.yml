@@ -1,20 +1,28 @@
 networks:
-  monitoring:
+  app_network:
     driver: bridge
+
+volumes:
+  postgres-data:
 
 services:
   db:
     image: postgres:16-alpine
     container_name: postgres_db
     restart: always
+    env_file:
+      - ../.env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: strong_password_here
       POSTGRES_DB: core
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - app_network
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d core']
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
     build:
@@ -28,14 +36,8 @@ services:
     ports:
       - '8080:8080'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app_network
     command: sh -c "npx prisma migrate deploy && node dist/src/main.js"
-
-  networks:
-    app_network:
-      driver: bridge
-
-  volumes:
-    postgres-data:

@@ -2,8 +2,8 @@
 # Node / NestJS
 # =========================
 node_modules
-/dist
-/build
+dist
+build
 
 # =========================
 # Logs
@@ -25,8 +25,8 @@ Thumbs.db
 # =========================
 # Tests
 # =========================
-/coverage
-/.nyc_output
+coverage
+.nyc_output
 
 # =========================
 # IDEs and editors
@@ -40,16 +40,21 @@ Thumbs.db
 .idea
 .project
 .classpath
-.c9/
+.c9
 *.launch
-.settings/
+.settings
 *.sublime-workspace
 
 # =========================
 # Environment variables
 # =========================
 .env
+.env.local
+.env.production
+.env.development
+.env.test
 .env.*
+
 !.env.example
 
 # =========================
@@ -71,21 +76,26 @@ pids
 # =========================
 node_modules/.prisma
 prisma/generated
+generated/prisma
 
 # =========================
-# Database (на всякий случай)
+# Database
 # =========================
 *.db
 *.sqlite
 
 # =========================
-# Docker volumes (ВАЖНО)
+# Docker volumes
 # =========================
 deployments/postgres-data
 deployments/minio-data
 
 # =========================
+# Docker
+# =========================
+docker-data
+
+# =========================
 # Misc
 # =========================
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-/generated/prisma
+report.*.*.*.*.json

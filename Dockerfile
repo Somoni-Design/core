@@ -1,8 +1,6 @@
-FROM node:22-alpine AS dev
+FROM mirror.gcr.io/library/node:22-alpine AS dev
 
 WORKDIR /app
-
-RUN apk add --no-cache openssl libc6-compat
 
 COPY package*.json ./
 RUN npm ci
@@ -14,11 +12,9 @@ EXPOSE 8080
 CMD ["sh", "-c", "npx prisma generate && npm run start:dev"]
 
 
-FROM node:22-alpine AS build
+FROM mirror.gcr.io/library/node:22-alpine AS build
 
 WORKDIR /app
-
-RUN apk add --no-cache openssl libc6-compat
 
 COPY package*.json ./
 RUN npm ci
@@ -29,11 +25,9 @@ RUN npx prisma generate
 RUN npm run build
 
 
-FROM node:22-alpine AS production
+FROM mirror.gcr.io/library/node:22-alpine AS production
 
 WORKDIR /app
-
-RUN apk add --no-cache openssl libc6-compat
 
 COPY package*.json ./
 RUN npm ci --omit=dev

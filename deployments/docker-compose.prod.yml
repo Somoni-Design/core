@@ -24,6 +24,18 @@ services:
       timeout: 5s
       retries: 5
 
+  db-adminer:
+    image: dockette/adminer:full
+    container_name: db_adminer
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:5051:80'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+
   backend:
     build:
       context: ..

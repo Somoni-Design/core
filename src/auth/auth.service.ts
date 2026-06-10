@@ -8,7 +8,7 @@ import { User, UserStatus } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 import { PrismaService } from 'src/prisma.service'
-import { SmsCodeService } from './sms-code.service'
+import { EmailCodeService } from './email-code.service'
 
 import { LoginDto } from './dto/login.dto'
 import { SendCodeDto } from './dto/send-code.dto'
@@ -22,8 +22,6 @@ import {
 	errorResponse
 } from 'src/common/constants/errors.constant'
 
-import { normalizePhone } from 'src/common/helpers/normalize-phone.helper'
-
 type SetPasswordPayload = {
 	sub: string
 	type: 'set-password'
@@ -33,31 +31,31 @@ type SetPasswordPayload = {
 export class AuthService {
 	constructor(
 		private readonly prisma: PrismaService,
-		private readonly smsCodeService: SmsCodeService,
+		private readonly emailCodeService: EmailCodeService,
 		private readonly jwtService: JwtService
 	) {}
 
 	async sendCode(dto: SendCodeDto) {
-		return this.smsCodeService.sendCode(dto.phone)
+		return this.emailCodeService.sendCode(dto.email)
 	}
 
 	async verify(dto: VerifyDto) {
-		const phone = await this.smsCodeService.verify(dto.phone, dto.code)
+		const email = await this.emailCodeService.verify(dto.email, dto.code)
 
 		const user = await this.prisma.user.findUnique({
-			where: { phone }
+			where: { email }
 		})
 
 		if (!user) {
 			const createdUser = await this.prisma.user.create({
 				data: {
-					phone,
-					isPhoneVerified: true,
+					email,
+					isEmailVerified: true,
 					status: UserStatus.PENDING
 				},
 				select: {
 					id: true,
-					phone: true,
+					email: true,
 					status: true
 				}
 			})
@@ -73,7 +71,7 @@ export class AuthService {
 				action: AUTH_ACTIONS.WAIT_APPROVAL,
 				user: {
 					id: user.id,
-					phone: user.phone,
+					email: user.email,
 					status: user.status
 				}
 			}
@@ -104,7 +102,7 @@ export class AuthService {
 			action: AUTH_ACTIONS.LOGIN_WITH_PASSWORD
 		}
 	}
-	
+
 	async setPassword(dto: SetPasswordDto) {
 		let payload: SetPasswordPayload
 
@@ -153,10 +151,10 @@ export class AuthService {
 	}
 
 	async login(dto: LoginDto) {
-		const phone = normalizePhone(dto.phone)
+		const email = dto.email.toLowerCase().trim()
 
 		const user = await this.prisma.user.findUnique({
-			where: { phone }
+			where: { email }
 		})
 
 		if (!user || !user.passwordHash) {
@@ -192,7 +190,7 @@ export class AuthService {
 	private buildAuthResponse(user: User) {
 		const accessToken = this.jwtService.sign({
 			sub: user.id,
-			phone: user.phone,
+			email: user.email,
 			role: user.role
 		})
 
@@ -200,6 +198,7 @@ export class AuthService {
 			accessToken,
 			user: {
 				id: user.id,
+				email: user.email,
 				phone: user.phone,
 				fullName: user.fullName,
 				role: user.role,

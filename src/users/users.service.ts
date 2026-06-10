@@ -44,7 +44,8 @@ export class UsersService {
 		return this.prisma.user.update({
 			where: { id },
 			data: {
-				fullName: dto.fullName
+				fullName: dto.fullName,
+				phone: dto.phone
 			},
 			select: returnUserObject
 		})

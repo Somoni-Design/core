@@ -28,12 +28,13 @@ model User {
   id              String     @id @default(uuid())
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
-  phone           String     @unique
+  email           String     @unique
+  phone           String?    @unique
   fullName        String?
   passwordHash    String?
   role            UserRole?
   status          UserStatus @default(PENDING)
-  isPhoneVerified Boolean    @default(false)
+  isEmailVerified Boolean    @default(false)
 
   expenses   Expense[]
   apartments Apartment[]
@@ -44,13 +45,13 @@ model User {
 model AuthCode {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
-  phone     String
+  email     String
   codeHash  String
   attempts  Int      @default(0)
   expiresAt DateTime
   isUsed    Boolean  @default(false)
 
-  @@index([phone])
+  @@index([email])
   @@map("auth_codes")
 }
 

@@ -6,8 +6,8 @@ import { getJwtConfig } from 'src/config/jwt.config'
 import { PrismaService } from 'src/prisma.service'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { EmailCodeService } from './email-code.service'
 import { JwtStrategy } from './jwt.strategy'
-import { SmsCodeService } from './sms-code.service'
 
 @Module({
 	imports: [
@@ -20,7 +20,7 @@ import { SmsCodeService } from './sms-code.service'
 		})
 	],
 	controllers: [AuthController],
-	providers: [AuthService, SmsCodeService, JwtStrategy, PrismaService],
-	exports: [AuthService, SmsCodeService]
+	providers: [AuthService, EmailCodeService, JwtStrategy, PrismaService],
+	exports: [AuthService, EmailCodeService, PrismaService]
 })
 export class AuthModule {}

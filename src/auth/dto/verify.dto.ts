@@ -1,10 +1,8 @@
-import { IsString, Matches } from 'class-validator'
-import { IsPhone } from 'src/common/decorators/phone.decorator'
+import { IsEmail, IsString, Matches } from 'class-validator'
 
 export class VerifyDto {
-	@IsString()
-	@IsPhone()
-	phone!: string
+	@IsEmail()
+	email!: string
 
 	@IsString()
 	@Matches(/^\d{6}$/, {

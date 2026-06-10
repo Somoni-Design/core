@@ -1,10 +1,8 @@
-import { IsString, MinLength } from 'class-validator'
-import { IsPhone } from 'src/common/decorators/phone.decorator'
+import { IsEmail, IsString, MinLength } from 'class-validator'
 
 export class LoginDto {
-	@IsString()
-	@IsPhone()
-	phone!: string
+	@IsEmail()
+	email!: string
 
 	@IsString()
 	@MinLength(8)

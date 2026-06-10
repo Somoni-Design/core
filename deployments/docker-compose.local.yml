@@ -1,7 +1,3 @@
-networks:
-  monitoring:
-    driver: bridge
-
 services:
   db:
     image: postgres:16-alpine
@@ -9,10 +5,23 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: strong_password_here
+      POSTGRES_PASSWORD: 14022004
       POSTGRES_DB: core
+    ports:
+      - '5432:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  db-adminer:
+    image: dockette/adminer:full
+    container_name: db_adminer
+    restart: always
+    ports:
+      - '5051:80'
+    depends_on:
+      - db
     networks:
       - app_network
 
@@ -33,9 +42,9 @@ services:
       - app_network
     command: sh -c "npx prisma migrate deploy && node dist/src/main.js"
 
-  networks:
-    app_network:
-      driver: bridge
+networks:
+  app_network:
+    driver: bridge
 
-  volumes:
-    postgres-data:
+volumes:
+  postgres-data:

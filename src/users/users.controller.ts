@@ -26,6 +26,12 @@ export class UsersController {
 		return this.usersService.findMe(user.id)
 	}
 
+	@Get('pending')
+	@HttpCode(HttpStatus.OK)
+	findPending(@CurrentUser() user: RequestWithUser['user']) {
+		return this.usersService.findPending(user.role)
+	}
+
 	@Patch('me')
 	@HttpCode(HttpStatus.OK)
 	updateMe(

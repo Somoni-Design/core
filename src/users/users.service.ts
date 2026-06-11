@@ -4,11 +4,11 @@ import {
 	Injectable
 } from '@nestjs/common'
 import { UserRole, UserStatus } from '@prisma/client'
-
 import {
 	ERROR_CODES,
 	errorResponse
 } from 'src/common/constants/errors.constant'
+import { listResponse } from 'src/common/helpers/list-response.helper'
 import { PrismaService } from 'src/prisma.service'
 
 import { UpdateMeDto } from './dto/update-me.dto'
@@ -36,6 +36,20 @@ export class UsersService {
 		}
 
 		return user
+	}
+
+	async findPending(adminRole: UserRole | null) {
+		this.checkAdmin(adminRole)
+		const users = await this.prisma.user.findMany({
+			where: {
+				status: UserStatus.PENDING
+			},
+			orderBy: {
+				createdAt: 'desc'
+			},
+			select: returnUserObject
+		})
+		return listResponse(users, users.length)
 	}
 
 	async updateMe(id: string, dto: UpdateMeDto) {

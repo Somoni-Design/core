@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
-import * as nodemailer from 'nodemailer'
 
 import { PrismaService } from 'src/prisma.service'
 
@@ -86,21 +85,34 @@ export class EmailCodeService {
 	}
 
 	private async sendEmailCode(email: string, code: string) {
-		const transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST,
-			port: Number(process.env.SMTP_PORT),
-			secure: process.env.SMTP_SECURE === 'true',
-			auth: {
-				user: process.env.SMTP_USER,
-				pass: process.env.SMTP_PASS
-			}
-		})
+		const apiKey = process.env.BREVO_API_KEY
+		const senderEmail =
+			process.env.MAIL_FROM_EMAIL || 'noreply@somoni-design.tj'
+		const senderName = process.env.MAIL_FROM_NAME || 'Somoni Design'
 
-		await transporter.sendMail({
-			from: process.env.SMTP_FROM,
-			to: email,
-			subject: 'Код подтверждения Somoni Design',
-			html: `
+		if (!apiKey) {
+			throw new Error('BREVO_API_KEY is not set')
+		}
+
+		const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'api-key': apiKey
+			},
+			body: JSON.stringify({
+				sender: {
+					name: senderName,
+					email: senderEmail
+				},
+				to: [
+					{
+						email
+					}
+				],
+				subject: 'Код подтверждения Somoni Design',
+				htmlContent: `
 	<!DOCTYPE html>
 	<html>
 	<head>
@@ -170,8 +182,14 @@ export class EmailCodeService {
 		</div>
 	</body>
 	</html>
-	`
+				`
+			})
 		})
+
+		if (!response.ok) {
+			const errorText = await response.text()
+			throw new Error(`Brevo API error: ${errorText}`)
+		}
 	}
 
 	private generateCode(): string {

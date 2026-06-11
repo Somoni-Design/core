@@ -3,7 +3,7 @@ import {
 	ForbiddenException,
 	Injectable
 } from '@nestjs/common'
-import { UserRole, UserStatus } from '@prisma/client'
+import { Prisma, UserRole, UserStatus } from '@prisma/client'
 import {
 	ERROR_CODES,
 	errorResponse
@@ -25,6 +25,12 @@ export class UsersService {
 		}
 	}
 
+	private checkOwner(role: UserRole | null) {
+		if (role !== UserRole.ADMIN && role !== UserRole.OWNER) {
+			throw new ForbiddenException(errorResponse(ERROR_CODES.FORBIDDEN))
+		}
+	}
+
 	async findMe(id: string) {
 		const user = await this.prisma.user.findUnique({
 			where: { id },
@@ -40,16 +46,60 @@ export class UsersService {
 
 	async findPending(adminRole: UserRole | null) {
 		this.checkAdmin(adminRole)
-		const users = await this.prisma.user.findMany({
-			where: {
-				status: UserStatus.PENDING
-			},
-			orderBy: {
-				createdAt: 'desc'
-			},
-			select: returnUserObject
-		})
-		return listResponse(users, users.length)
+
+		const [list, count] = await this.prisma.$transaction([
+			this.prisma.user.findMany({
+				where: {
+					status: UserStatus.PENDING
+				},
+				orderBy: {
+					createdAt: 'desc'
+				},
+				select: returnUserObject
+			}),
+			this.prisma.user.count({
+				where: {
+					status: UserStatus.PENDING
+				}
+			})
+		])
+
+		return listResponse(list, count)
+	}
+
+	async findEmployees(userId: string, role: UserRole | null) {
+		this.checkOwner(role)
+
+		const where: Prisma.UserWhereInput =
+			role === UserRole.OWNER
+				? {
+						id: {
+							not: userId
+						},
+						role: {
+							in: [UserRole.SUPPLIER, UserRole.WAREHOUSE_MANAGER]
+						}
+					}
+				: {
+						id: {
+							not: userId
+						},
+					}
+
+		const [list, count] = await this.prisma.$transaction([
+			this.prisma.user.findMany({
+				where,
+				orderBy: {
+					createdAt: 'desc'
+				},
+				select: returnUserObject
+			}),
+			this.prisma.user.count({
+				where
+			})
+		])
+
+		return listResponse(list, count)
 	}
 
 	async updateMe(id: string, dto: UpdateMeDto) {
@@ -116,6 +166,7 @@ export class UsersService {
 
 	async approve(adminRole: UserRole | null, id: string, role: UserRole) {
 		this.checkAdmin(adminRole)
+
 		const user = await this.prisma.user.findUnique({
 			where: { id }
 		})

@@ -6,6 +6,7 @@ import {
 import { formatDate } from 'src/common/helpers/date.helper'
 import { listResponse } from 'src/common/helpers/list-response.helper'
 import { PrismaService } from 'src/prisma.service'
+import { returnUserObject } from 'src/users/objects/return-user.object'
 import { CreateExpenseDto } from './dto/create-expense.dto'
 import { UpdateExpenseDto } from './dto/update-expense.dto'
 
@@ -26,12 +27,7 @@ export class ExpensesService {
 			include: {
 				apartment: true,
 				supplier: {
-					select: {
-						id: true,
-						phone: true,
-						fullName: true,
-						role: true
-					}
+					select: returnUserObject
 				}
 			}
 		})
@@ -47,12 +43,7 @@ export class ExpensesService {
 				include: {
 					apartment: true,
 					supplier: {
-						select: {
-							id: true,
-							phone: true,
-							fullName: true,
-							role: true
-						}
+						select: returnUserObject
 					}
 				},
 				orderBy: {
@@ -70,12 +61,7 @@ export class ExpensesService {
 			include: {
 				apartment: true,
 				supplier: {
-					select: {
-						id: true,
-						phone: true,
-						fullName: true,
-						role: true
-					}
+					select: returnUserObject
 				}
 			}
 		})
@@ -116,12 +102,7 @@ export class ExpensesService {
 			include: {
 				apartment: true,
 				supplier: {
-					select: {
-						id: true,
-						phone: true,
-						fullName: true,
-						role: true
-					}
+					select: returnUserObject
 				}
 			}
 		})

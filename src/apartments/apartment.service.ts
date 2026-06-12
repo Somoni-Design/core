@@ -5,6 +5,7 @@ import {
 } from 'src/common/constants/errors.constant'
 import { listResponse } from 'src/common/helpers/list-response.helper'
 import { PrismaService } from 'src/prisma.service'
+import { returnUserObject } from 'src/users/objects/return-user.object'
 import { CreateApartmentDto } from './dto/create-apartment.dto'
 import { UpdateApartmentDto } from './dto/update-apartment.dto'
 
@@ -24,6 +25,11 @@ export class ApartmentService {
 	async findAll() {
 		const [list, count] = await this.prisma.$transaction([
 			this.prisma.apartment.findMany({
+				include: {
+					supplier: {
+						select: returnUserObject
+					}
+				},
 				orderBy: {
 					createdAt: 'desc'
 				}
@@ -61,6 +67,9 @@ export class ApartmentService {
 					orderBy: {
 						spentAt: 'desc'
 					}
+				},
+				supplier: {
+					select: returnUserObject
 				}
 			}
 		})

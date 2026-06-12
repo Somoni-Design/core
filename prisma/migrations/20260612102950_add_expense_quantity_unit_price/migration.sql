@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "expenses" ADD COLUMN     "quantity" DECIMAL(12,2) NOT NULL DEFAULT 1,
+ADD COLUMN     "unitPrice" DECIMAL(12,2) NOT NULL DEFAULT 0;

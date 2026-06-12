@@ -18,8 +18,12 @@ export class CreateExpenseDto {
 	title!: string
 
 	@IsNumber()
+	@Min(0.01)
+	quantity!: number
+
+	@IsNumber()
 	@Min(0)
-	amount!: number
+	unitPrice!: number
 
 	@IsDateString()
 	spentAt!: string

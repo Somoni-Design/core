@@ -15,10 +15,13 @@ export class ExpensesService {
 	constructor(private readonly prisma: PrismaService) {}
 
 	async create(supplierId: string, dto: CreateExpenseDto) {
+		const amount = dto.quantity * dto.unitPrice
 		const expense = await this.prisma.expense.create({
 			data: {
 				title: dto.title,
-				amount: dto.amount,
+				quantity: dto.quantity,
+				unitPrice: dto.unitPrice,
+				amount,
 				spentAt: new Date(dto.spentAt),
 				apartmentId: dto.apartmentId,
 				type: dto.type,
@@ -76,25 +79,29 @@ export class ExpensesService {
 	}
 
 	async update(id: string, dto: UpdateExpenseDto) {
-		await this.findOne(id)
-
+		const expense = await this.findOne(id)
 		if (dto.apartmentId) {
 			const apartment = await this.prisma.apartment.findUnique({
 				where: { id: dto.apartmentId }
 			})
-
 			if (!apartment) {
 				throw new BadRequestException(
 					errorResponse(ERROR_CODES.APARTMENT_NOT_FOUND)
 				)
 			}
 		}
-
+		const quantity =
+			dto.quantity !== undefined ? dto.quantity : Number(expense.quantity)
+		const unitPrice =
+			dto.unitPrice !== undefined ? dto.unitPrice : Number(expense.unitPrice)
+		const amount = quantity * unitPrice
 		return this.prisma.expense.update({
 			where: { id },
 			data: {
 				title: dto.title,
-				amount: dto.amount,
+				quantity: dto.quantity,
+				unitPrice: dto.unitPrice,
+				amount,
 				spentAt: dto.spentAt ? new Date(dto.spentAt) : undefined,
 				type: dto.type,
 				apartmentId: dto.apartmentId
